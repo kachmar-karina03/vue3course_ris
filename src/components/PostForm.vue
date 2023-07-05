@@ -13,12 +13,12 @@
       type="text"
       placeholder="Description"
     >
-    <button
-      class="btn"
+    <my-button
+      class="btn create-button"
       @click="createPost"
     >
       Create post
-    </button>
+    </my-button>
   </form>
 </template>
 
@@ -58,12 +58,8 @@ export default {
     margin-top: 15px;
   }
 
-  .btn {
-    margin-top: 15px;
+  .create-button{
     align-self: flex-end;
-    padding: 10px 15px;
-    background: none;
-    color: teal;
-    border: 1px solid teal;
+    margin-top: 15px;
   }
 </style>
