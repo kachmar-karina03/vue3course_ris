@@ -1,12 +1,18 @@
 <template>
   <div class="app">
     <h1>Posts</h1>
-    <my-button
-      @click="showDialog"
-      style="margin: 15px 0;"
-    >
-      Create post
-    </my-button>
+    <div class="app__btns">
+      <my-button
+        @click="showDialog"
+      >
+        Create post
+      </my-button>
+      <my-select
+        v-model="selectedSort"
+        :options="sortOptions"
+      />
+    </div>
+
     <my-dialog v-model:show="dialogVisible">
       <post-form
         @create="createPost"
@@ -15,7 +21,9 @@
     <post-list
       :posts="posts"
       @remove="removePost"
+      v-if="!isPostsLoading"
     />
+    <div v-else>Loading...</div>
   </div>
 </template>
 
@@ -23,19 +31,22 @@
 <script>
 import PostForm from "@/components/PostForm";
 import PostList from "@/components/PostList";
+import axios from 'axios';
+
 export default {
   components: {
     PostList, PostForm
   },
   data() {
     return {
-      posts: [
-        {id: 1, title: 'JavaScript 1', body: 'Post description. 1'},
-        {id: 2, title: 'JavaScript 2', body: 'Post description. 2'},
-        {id: 3, title: 'JavaScript 3', body: 'Post description. 3'},
-        {id: 4, title: 'JavaScript 4', body: 'Post description. 4'}
-      ],
-      dialogVisible: false
+      posts: [],
+      dialogVisible: false,
+      isPostsLoading: false,
+      selectedSort: '',
+      sortOptions: [
+        { value: 'title', name: 'By title' },
+        { value: 'body', name: 'By body' },
+      ]
     }
   },
   methods: {
@@ -48,7 +59,23 @@ export default {
     },
     showDialog(){
       this.dialogVisible = true;
+    },
+    async fetchPosts() {
+      try {
+        this.isPostsLoading = true;
+        const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
+        this.posts = response.data;
+      } catch(e) {
+        alert('Error!');
+        console.log(e);
+      } finally {
+        this.isPostsLoading = false;
+
+      }
     }
+  },
+  mounted() {
+    this.fetchPosts();
   }
 }
 </script>
@@ -63,6 +90,12 @@ export default {
 
   .app {
     padding: 20px;
+  }
+
+  .app__btns {
+    display: flex;
+    justify-content: space-between;
+    margin: 15px 0;
   }
 
 </style>
