@@ -1,0 +1,34 @@
+---
+- name: Install and configure Nginx
+  hosts: localhost
+  connection: local
+  become: yes
+  tasks:
+    - name: Install Nginx dependencies
+      homebrew:
+        name: pcre
+        state: present
+
+    - name: Download and extract Nginx source
+      get_url:
+        url: "http://nginx.org/download/nginx-1.20.1.tar.gz"
+        dest: "/tmp/nginx.tar.gz"
+
+    - name: Extract Nginx source
+      ansible.builtin.archive:
+        src: "/tmp/nginx.tar.gz"
+        dest: "/tmp/nginx"
+
+    - name: Configure and install Nginx
+      command: "sh configure --prefix=/usr/local/nginx && make && make install"
+      args:
+        chdir: "/tmp/nginx/nginx-1.20.1"
+
+    - name: Copy Nginx configuration file
+      copy:
+        src: nginx.conf
+        dest: "/usr/local/nginx/conf/nginx.conf"
+
+    - name: Start Nginx
+      command: "/usr/local/nginx/sbin/nginx"
+
